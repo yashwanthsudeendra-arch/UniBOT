@@ -1,0 +1,2333 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CampusSphere Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Isolated Chatbot Script (at the top to ensure it's independent)
+        const FAQ_DATA = [
+            { keywords: ['attendance', 'percentage', 'bunk', 'miss'], answer: 'Minimum 75% attendance is mandatory. Check "Attendance analytics" for details.' },
+            { keywords: ['marks', 'score', 'result', 'internal', 'grade'], answer: 'Internal marks are in the "Marks performance" section.' },
+            { keywords: ['note', 'pdf', 'resource', 'book'], answer: 'Notes are in the "Resources library" tab.' },
+            { keywords: ['rule', 'policy', 'id card', 'mobile', 'lab'], answer: 'Rules: 75% attendance, carry ID, no phones in labs.' },
+            { keywords: ['circular', 'notice', 'update'], answer: 'Check "Circular centre" for updates.' },
+            { keywords: ['hello', 'hi', 'hey'], answer: 'Hello! I am UniBOT. Ask about attendance, marks, notes, or rules.' }
+        ];
+
+        function onChatSend() {
+            const input = document.getElementById('chatInput');
+            const box = document.getElementById('chatMessages');
+            const txt = input.value.trim();
+            if (!txt) return;
+
+            input.value = '';
+            
+            // Add user message
+            const uMsg = document.createElement('div');
+            uMsg.className = 'msg user';
+            uMsg.textContent = txt;
+            box.appendChild(uMsg);
+            box.scrollTop = box.scrollHeight;
+
+            // Simple bot reply
+            setTimeout(() => {
+                const lower = txt.toLowerCase();
+                let reply = 'I am sorry, I can only answer specific academic questions about portal data. Please contact your Admin or Teacher.';
+                for (const item of FAQ_DATA) {
+                    if (item.keywords.some(k => lower.includes(k))) { reply = item.answer; break; }
+                }
+                const bMsg = document.createElement('div');
+                bMsg.className = 'msg bot';
+                bMsg.textContent = reply;
+                box.appendChild(bMsg);
+                box.scrollTop = box.scrollHeight;
+            }, 400);
+        }
+    </script>
+    <style>
+        :root,
+        [data-theme="light"] {
+            --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+            --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+            --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+            --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+            --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+            --space-1: .25rem;
+            --space-2: .5rem;
+            --space-3: .75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+            --color-bg: #f6f5f1;
+            --color-surface: #fbfaf7;
+            --color-surface-2: #ffffff;
+            --color-surface-offset: #f1eeea;
+            --color-surface-accent: #edf4f3;
+            --color-border: #d7d3cb;
+            --color-divider: #dfdbd3;
+            --color-text: #1f1b16;
+            --color-text-muted: #6d6861;
+            --color-text-faint: #9a948c;
+            --color-text-inverse: #fdfcf9;
+            --color-primary: #0b6f74;
+            --color-primary-hover: #09575b;
+            --color-primary-highlight: #d3e4e2;
+            --color-blue: #2d6fd2;
+            --color-success: #4f7c24;
+            --color-warning: #a95b16;
+            --color-error: #a2366f;
+            --radius-sm: .25rem;
+            --radius-md: .375rem;
+            --radius-lg: .5rem;
+            --radius-xl: .75rem;
+            --radius-full: 9999px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Manrope', sans-serif;
+            --transition-interactive: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-enter: 380ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        [data-theme="dark"] {
+            --color-bg: #121210;
+            --color-surface: #181715;
+            --color-surface-2: #1d1c1a;
+            --color-surface-offset: #252320;
+            --color-surface-accent: #1d2828;
+            --color-border: #34322f;
+            --color-divider: #2b2926;
+            --color-text: #f2ede4;
+            --color-text-muted: #b6b0a8;
+            --color-text-faint: #7d7871;
+            --color-text-inverse: #0f0f0e;
+            --color-primary: #5fa3ad;
+            --color-primary-hover: #458892;
+            --color-primary-highlight: #273637;
+            --color-blue: #7ea8ea;
+            --color-success: #78b44d;
+            --color-warning: #d4834b;
+            --color-error: #d26aa6;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+        }
+
+        *,
+        :before,
+        :after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            -webkit-font-smoothing: antialiased;
+            scroll-behavior: smooth
+        }
+
+        body {
+            font-family: var(--font-body);
+            font-size: var(--text-base);
+            line-height: 1.6;
+            background: var(--color-bg);
+            color: var(--color-text);
+            min-height: 100vh
+        }
+
+        img,
+        svg,
+        canvas {
+            display: block;
+            max-width: 100%;
+            height: auto
+        }
+
+        button,
+        input,
+        textarea,
+        select {
+            font: inherit;
+            color: inherit
+        }
+
+        button {
+            border: none;
+            background: none;
+            cursor: pointer
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: var(--font-display);
+            line-height: 1.08;
+            letter-spacing: -.03em
+        }
+
+        p,
+        li {
+            max-width: 72ch
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit
+        }
+
+        :focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 3px;
+            border-radius: var(--radius-sm)
+        }
+
+        .skip-link {
+            position: absolute;
+            left: -9999px;
+            top: auto
+        }
+
+        .skip-link:focus {
+            left: 1rem;
+            top: 1rem;
+            background: var(--color-surface-2);
+            padding: .75rem 1rem;
+            border-radius: var(--radius-md);
+            z-index: 200
+        }
+
+        /* Login Page Styles */
+        .login-page {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: var(--color-bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-6);
+            overflow-y: auto;
+        }
+
+        .login-page .brand-card {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            margin-bottom: var(--space-6);
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .login-page .brand-card:before {
+            display: none;
+        }
+
+        .login-page .logo-wrap {
+            width: 72px;
+            height: 72px;
+            border-radius: 24px;
+        }
+
+        .login-page .brand-copy h1 {
+            font-size: var(--text-xl);
+            margin-top: var(--space-3);
+        }
+
+        .login-page .brand-copy p {
+            font-size: var(--text-sm);
+        }
+
+        .app-shell {
+            display: grid;
+            grid-template-columns: 292px 1fr;
+            min-height: 100vh
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            padding: var(--space-5);
+            border-right: 1px solid var(--color-border);
+            background: var(--color-surface);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-5)
+        }
+
+        .brand-card,
+        .sidebar-block,
+        .surface-card,
+        .metric-card,
+        .spotlight,
+        .feature-tile,
+        .login-tile,
+        .empty-state,
+        .activity-card,
+        .progress-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            box-shadow: var(--shadow-sm)
+        }
+
+        .brand-card {
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .brand-card:before {
+            display: none
+        }
+
+        .logo-wrap {
+            width: 46px;
+            height: 46px;
+            flex-shrink: 0;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            color: #fff;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-blue));
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden
+        }
+
+        .logo-wrap:after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, .24), transparent 60%)
+        }
+
+        .brand-copy h1 {
+            font-size: var(--text-base);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 0.15rem;
+        }
+
+        .brand-copy p {
+            font-size: 0.7rem;
+            color: var(--color-text-muted);
+            white-space: nowrap;
+        }
+
+        .sidebar-block {
+            border-radius: var(--radius-xl);
+            padding: var(--space-4);
+            display: grid;
+            gap: var(--space-3)
+        }
+
+        .tiny-label {
+            font-size: var(--text-xs);
+            text-transform: uppercase;
+            letter-spacing: .12em;
+            color: var(--color-text-muted);
+            font-weight: 700
+        }
+
+        .role-grid,
+        .nav-grid {
+            display: grid;
+            gap: var(--space-2)
+        }
+
+        .role-btn,
+        .nav-btn,
+        .top-icon,
+        .action-btn,
+        .filter-chip,
+        .segment button {
+            transition: background var(--transition-interactive), color var(--transition-interactive), box-shadow var(--transition-interactive), transform var(--transition-interactive), border-color var(--transition-interactive)
+        }
+
+        .role-btn,
+        .nav-btn {
+            padding: 0.9rem 1rem;
+            border-radius: var(--radius-lg);
+            text-align: left;
+            font-size: var(--text-sm);
+            font-weight: 700;
+            color: var(--color-text-muted);
+            border: 1px solid transparent
+        }
+
+        .role-btn:hover,
+        .nav-btn:hover {
+            background: var(--color-surface-offset);
+            color: var(--color-text);
+            transform: translateY(-1px)
+        }
+
+        .role-btn.active,
+        .nav-btn.active {
+            background: var(--color-primary);
+            color: var(--color-text-inverse);
+            box-shadow: var(--shadow-md)
+        }
+
+        .status-row {
+            display: flex;
+            gap: var(--space-3);
+            align-items: center;
+            justify-content: space-between;
+            padding: .85rem 1rem;
+            border-radius: var(--radius-lg);
+            background: var(--color-surface-offset)
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--color-success);
+            box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-success) 12%, transparent);
+            animation: pulse 2.4s infinite
+        }
+
+        .main {
+            min-width: 0;
+            display: flex;
+            flex-direction: column
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: var(--space-4);
+            padding: var(--space-5) var(--space-6);
+            border-bottom: 1px solid var(--color-border);
+            background: var(--color-bg)
+        }
+
+        .topbar-copy h2 {
+            font-size: var(--text-xl)
+        }
+
+        .topbar-copy p {
+            font-size: var(--text-sm);
+            color: var(--color-text-muted)
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            flex-wrap: wrap
+        }
+
+        .top-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-full);
+            display: grid;
+            place-items: center;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            box-shadow: var(--shadow-sm)
+        }
+
+        .top-icon:hover,
+        .action-btn:hover,
+        .filter-chip:hover,
+        .segment button:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md)
+        }
+
+        .top-icon:active,
+        .action-btn:active,
+        .filter-chip:active,
+        .segment button:active {
+            transform: translateY(0)
+        }
+
+        .action-btn {
+            padding: .88rem 1.15rem;
+            border-radius: var(--radius-lg);
+            font-size: var(--text-sm);
+            font-weight: 700
+        }
+
+        .action-btn.primary {
+            background: var(--color-primary);
+            color: var(--color-text-inverse)
+        }
+
+        .action-btn.secondary {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border)
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .45rem;
+            padding: .35rem .8rem;
+            border-radius: var(--radius-full);
+            font-size: var(--text-xs);
+            font-weight: 800;
+            letter-spacing: .02em
+        }
+
+        .badge.primary {
+            background: var(--color-primary-highlight);
+            color: var(--color-primary)
+        }
+
+        .badge.success {
+            background: color-mix(in srgb, var(--color-success) 14%, var(--color-surface));
+            color: var(--color-success)
+        }
+
+        .badge.warning {
+            background: color-mix(in srgb, var(--color-warning) 14%, var(--color-surface));
+            color: var(--color-warning)
+        }
+
+        .badge.error {
+            background: color-mix(in srgb, var(--color-error) 14%, var(--color-surface));
+            color: var(--color-error)
+        }
+
+        .content {
+            padding: var(--space-5);
+            display: grid;
+            gap: var(--space-5)
+        }
+
+        .page-section {
+            display: grid;
+            gap: var(--space-5);
+            animation: sectionIn var(--transition-enter)
+        }
+
+        .hero-layout {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: var(--space-5)
+        }
+
+        .spotlight {
+            border-radius: var(--radius-xl);
+            padding: var(--space-4);
+            position: relative;
+            overflow: hidden;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border)
+        }
+
+        .spotlight:before {
+            display: none
+        }
+
+        .spotlight-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+            align-items: stretch;
+        }
+
+        .spotlight h3 {
+            font-size: var(--text-lg);
+            max-width: none;
+            line-height: 1.2;
+        }
+
+        .spotlight p {
+            margin-top: var(--space-3);
+            font-size: var(--text-sm);
+            color: var(--color-text-muted);
+            max-width: 90%;
+        }
+
+        .spotlight-actions {
+            display: flex;
+            gap: var(--space-3);
+            flex-wrap: wrap;
+            margin-top: var(--space-5)
+        }
+
+        .mini-panel {
+            border-radius: var(--radius-lg);
+            padding: var(--space-3) var(--space-4);
+            display: grid;
+            gap: var(--space-3);
+            background: var(--color-surface-offset)
+        }
+
+        .mini-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-2)
+        }
+
+        .metric-card {
+            border-radius: var(--radius-md);
+            padding: var(--space-3) var(--space-4);
+            position: relative;
+            overflow: hidden;
+            background: var(--color-surface-2);
+            border: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .metric-card:before {
+            display: none
+        }
+
+        .metric-card span {
+            font-size: 0.7rem;
+            color: var(--color-text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-bottom: 0.15rem;
+        }
+
+        .metric-card strong {
+            display: block;
+            font-size: var(--text-lg);
+            margin-top: 0;
+            font-weight: 800;
+            color: var(--color-text);
+            font-variant-numeric: tabular-nums lining-nums;
+            line-height: 1.2;
+        }
+
+        .metric-card small {
+            display: block;
+            margin-top: .25rem;
+            font-size: 0.7rem;
+            color: var(--color-text-faint);
+            font-weight: 500;
+        }
+
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-3)
+        }
+
+        .surface-card {
+            border-radius: var(--radius-lg);
+            overflow: hidden
+        }
+
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-4);
+            border-bottom: 1px solid var(--color-divider)
+        }
+
+        .section-head h3 {
+            font-size: var(--text-sm);
+            font-weight: 700
+        }
+
+        .section-head p {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            margin-top: 0.15rem;
+        }
+
+        .panel-body {
+            padding: var(--space-3) var(--space-4)
+        }
+
+        .grid-12 {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: var(--space-5)
+        }
+
+        .span-3 {
+            grid-column: span 3
+        }
+
+        .span-4 {
+            grid-column: span 4
+        }
+
+        .span-5 {
+            grid-column: span 5
+        }
+
+        .span-6 {
+            grid-column: span 6
+        }
+
+        .span-7 {
+            grid-column: span 7
+        }
+
+        .span-8 {
+            grid-column: span 8
+        }
+
+        .span-12 {
+            grid-column: span 12
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-4)
+        }
+
+        .feature-tile {
+            padding: var(--space-4);
+            border-radius: var(--radius-lg);
+            background: var(--color-surface-2);
+            display: grid;
+            gap: var(--space-3)
+        }
+
+        .feature-tile .icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: var(--color-surface-accent);
+            color: var(--color-primary)
+        }
+
+        .list {
+            display: grid;
+            gap: var(--space-2)
+        }
+
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            gap: var(--space-3);
+            align-items: center;
+            padding: var(--space-3);
+            border-radius: var(--radius-md);
+            background: var(--color-surface-2);
+            border: 1px solid var(--color-border);
+            transition: border-color var(--transition-interactive), box-shadow var(--transition-interactive), transform var(--transition-interactive)
+        }
+
+        .list-item:hover {
+            box-shadow: var(--shadow-sm);
+            border-color: var(--color-primary)
+        }
+
+        .muted {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted)
+        }
+
+        .table-wrap {
+            overflow: auto
+        }
+
+        th,
+        td {
+            padding: .95rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--color-divider);
+            font-size: var(--text-sm)
+        }
+
+        th {
+            font-size: var(--text-xs);
+            text-transform: uppercase;
+            letter-spacing: .12em;
+            color: var(--color-text-muted)
+        }
+
+        td strong {
+            font-variant-numeric: tabular-nums lining-nums
+        }
+
+        .progress {
+            height: 10px;
+            border-radius: var(--radius-full);
+            background: var(--color-surface-offset);
+            overflow: hidden;
+            margin-top: .5rem
+        }
+
+        .progress>span {
+            display: block;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, var(--color-primary), var(--color-blue));
+            width: 0;
+            animation: growBar 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards
+        }
+
+        .chat-shell {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            min-height: 560px;
+            background: var(--color-surface-2)
+        }
+
+        .chat-robot-panel {
+            position: relative;
+            padding: var(--space-5);
+            border-right: 1px solid var(--color-divider);
+            background: var(--color-surface);
+            overflow: hidden;
+            display: grid;
+            align-content: start;
+            gap: var(--space-4)
+        }
+
+        .chat-robot-panel:before {
+            display: none
+        }
+
+        .robot-stage {
+            position: relative;
+            display: grid;
+            place-items: center;
+            min-height: 320px;
+            padding: var(--space-4)
+        }
+
+        .robot-stage svg {
+            width: min(100%, 240px);
+            height: auto;
+            filter: drop-shadow(0 24px 50px rgba(11, 111, 116, .18));
+            animation: robotFloat 3.8s cubic-bezier(0.16, 1, 0.3, 1) infinite
+        }
+
+        .robot-badge {
+            position: absolute;
+            top: 18px;
+            right: 12px;
+            padding: .45rem .8rem;
+            border-radius: var(--radius-full);
+            font-size: var(--text-xs);
+            font-weight: 800;
+            background: var(--color-surface-2);
+            border: 1px solid var(--color-border);
+            box-shadow: var(--shadow-sm)
+        }
+
+        .robot-wave {
+            transform-origin: 18px 62px;
+            animation: robotWave 2.5s ease-in-out infinite
+        }
+
+        .robot-eye {
+            animation: robotBlink 4s ease-in-out infinite
+        }
+
+        .robot-glow {
+            animation: robotPulse 2.8s ease-in-out infinite
+        }
+
+        .chat-main {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            min-width: 0
+        }
+
+        .chat-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-4) var(--space-5);
+            border-bottom: 1px solid var(--color-divider)
+        }
+
+        .segment {
+            display: inline-flex;
+            background: var(--color-surface-offset);
+            padding: .3rem;
+            border-radius: var(--radius-full);
+            gap: .3rem
+        }
+
+        .segment button {
+            padding: .55rem .9rem;
+            border-radius: var(--radius-full);
+            font-size: var(--text-xs);
+            font-weight: 800
+        }
+
+        .segment button.active {
+            background: var(--color-surface-2);
+            box-shadow: var(--shadow-sm)
+        }
+
+        .chat-messages {
+            padding: var(--space-5);
+            display: grid;
+            gap: var(--space-4);
+            overflow: auto
+        }
+
+        .msg {
+            max-width: 84%;
+            padding: var(--space-4);
+            border-radius: var(--radius-lg);
+            font-size: var(--text-sm);
+            border: 1px solid var(--color-border);
+            animation: messageIn .45s cubic-bezier(0.16, 1, 0.3, 1)
+        }
+
+        .msg.bot {
+            background: var(--color-surface-offset)
+        }
+
+        .msg.user {
+            margin-left: auto;
+            background: var(--color-primary);
+            color: var(--color-text-inverse);
+            border-color: transparent
+        }
+
+        .chat-input {
+            display: flex;
+            gap: var(--space-3);
+            padding: var(--space-5);
+            border-top: 1px solid var(--color-divider)
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 1rem 1.05rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-border);
+            background: var(--color-surface-2)
+        }
+
+        .filter-row {
+            display: flex;
+            gap: var(--space-3);
+            flex-wrap: wrap
+        }
+
+        .filter-chip {
+            padding: .7rem .95rem;
+            border-radius: var(--radius-full);
+            border: 1px solid var(--color-border);
+            background: var(--color-surface);
+            font-size: var(--text-xs);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .08em
+        }
+
+        .filter-chip.active {
+            background: var(--color-primary);
+            color: var(--color-text-inverse);
+            border-color: transparent
+        }
+
+        .login-grid,
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-4)
+        }
+
+        .login-tile {
+            padding: var(--space-5);
+            border-radius: var(--radius-xl);
+            display: grid;
+            gap: var(--space-3);
+            background: var(--color-surface-2);
+        }
+
+        .login-tile input,
+        .form-grid input,
+        .form-grid textarea,
+        .form-grid select {
+            width: 100%;
+            padding: .95rem 1rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-border);
+            background: var(--color-surface-2)
+        }
+
+        .stats-line {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            flex-wrap: wrap
+        }
+
+        .timeline {
+            display: grid;
+            gap: var(--space-4)
+        }
+
+        .timeline-item {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: var(--space-4);
+            align-items: start
+        }
+
+        .timeline-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            margin-top: .3rem;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-blue));
+            box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-primary) 10%, transparent)
+        }
+
+        .activity-card,
+        .progress-card,
+        .empty-state {
+            padding: var(--space-4);
+            border-radius: var(--radius-lg)
+        }
+
+        .empty-state {
+            display: grid;
+            place-items: center;
+            text-align: center;
+            gap: var(--space-3);
+            min-height: 220px;
+            background: var(--color-surface-offset)
+        }
+
+        .floating-fab {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            width: 64px;
+            height: 64px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-blue));
+            color: white;
+            display: grid;
+            place-items: center;
+            box-shadow: var(--shadow-lg);
+            z-index: 30;
+            transition: transform var(--transition-interactive), box-shadow var(--transition-interactive)
+        }
+
+        .floating-fab:hover {
+            transform: translateY(-2px) scale(1.02)
+        }
+
+        .hidden {
+            display: none !important
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity .6s cubic-bezier(0.16, 1, 0.3, 1), transform .6s cubic-bezier(0.16, 1, 0.3, 1)
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0)
+        }
+
+        @keyframes sectionIn {
+            from {
+                opacity: 0;
+                filter: blur(8px)
+            }
+
+            to {
+                opacity: 1;
+                filter: blur(0)
+            }
+        }
+
+        @keyframes robotFloat {
+
+            0%,
+            100% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-10px)
+            }
+        }
+
+        @keyframes robotWave {
+
+            0%,
+            100% {
+                transform: rotate(0deg)
+            }
+
+            20% {
+                transform: rotate(-8deg)
+            }
+
+            40% {
+                transform: rotate(12deg)
+            }
+
+            60% {
+                transform: rotate(-6deg)
+            }
+
+            80% {
+                transform: rotate(8deg)
+            }
+        }
+
+        @keyframes robotBlink {
+
+            0%,
+            45%,
+            100% {
+                transform: scaleY(1)
+            }
+
+            48%,
+            52% {
+                transform: scaleY(.15)
+            }
+        }
+
+        @keyframes robotPulse {
+
+            0%,
+            100% {
+                opacity: .55
+            }
+
+            50% {
+                opacity: 1
+            }
+        }
+
+        @keyframes messageIn {
+            from {
+                opacity: 0;
+                transform: scale(.96)
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1)
+            }
+        }
+
+        @keyframes growBar {
+            to {
+                width: var(--target, 80%)
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1
+            }
+
+            50% {
+                transform: scale(1.12);
+                opacity: .72
+            }
+        }
+
+        @media (max-width: 1180px) {
+
+            .hero-layout,
+            .grid-12,
+            .kpi-row,
+            .feature-grid,
+            .login-grid,
+            .form-grid,
+            .chat-shell {
+                grid-template-columns: 1fr
+            }
+
+            .span-3,
+            .span-4,
+            .span-5,
+            .span-6,
+            .span-7,
+            .span-8,
+            .span-12 {
+                grid-column: span 1
+            }
+
+            .app-shell {
+                grid-template-columns: 1fr
+            }
+
+            .sidebar {
+                position: relative;
+                height: auto
+            }
+
+            .topbar {
+                position: relative
+            }
+
+            .spotlight-grid,
+            .mini-grid {
+                grid-template-columns: 1fr
+            }
+
+            .chat-robot-panel {
+                border-right: none;
+                border-bottom: 1px solid var(--color-divider)
+            }
+        }
+
+        @media (max-width: 720px) {
+
+            .content,
+            .topbar,
+            .sidebar {
+                padding: var(--space-4)
+            }
+
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column
+            }
+
+            .topbar-actions {
+                width: 100%
+            }
+
+            .action-btn {
+                flex: 1
+            }
+
+            .floating-fab {
+                right: 16px;
+                bottom: 16px;
+                width: 54px;
+                height: 54px
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *:before,
+            *:after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .01ms !important;
+                scroll-behavior: auto !important
+            }
+
+            .reveal {
+                opacity: 1;
+                transform: none
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-page" id="loginPage">
+        <div class="brand-card">
+            <div class="logo-wrap" aria-hidden="true">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9.5 12 4l9 5.5-9 5-9-5Z"></path>
+                    <path d="M7 12.5V16c0 1.5 2.8 3 5 3s5-1.5 5-3v-3.5"></path>
+                    <path d="M21 10v5"></path>
+                </svg>
+            </div>
+            <div class="brand-copy">
+                <h1>UniBOT</h1>
+                <p>An AI Powered ChatBot</p>
+            </div>
+        </div>
+        <div class="login-grid" style="max-width: 1000px; width: 100%;">
+            <form class="login-tile" onsubmit="event.preventDefault(); loginAs('student');">
+                <span class="badge primary">Student</span>
+                <strong style="font-size:var(--text-lg)">Student login</strong>
+                <input type="email" id="studentEmail" placeholder="student@college.edu" required />
+                <input type="password" id="studentPassword" placeholder="Password" required />
+                <div id="studentError" style="color: var(--color-error); font-size: var(--text-xs); display: none;">Invalid email or password</div>
+                <button type="submit" class="action-btn primary">Continue as student</button>
+            </form>
+            <form class="login-tile" onsubmit="event.preventDefault(); loginAs('teacher');">
+                <span class="badge success">Teacher</span>
+                <strong style="font-size:var(--text-lg)">Teacher login</strong>
+                <input type="email" id="teacherEmail" placeholder="teacher@college.edu" required />
+                <input type="password" id="teacherPassword" placeholder="Password" required />
+                <div id="teacherError" style="color: var(--color-error); font-size: var(--text-xs); display: none;">Invalid email or password</div>
+                <button type="submit" class="action-btn primary">Continue as teacher</button>
+            </form>
+            <form class="login-tile" onsubmit="event.preventDefault(); loginAs('admin');">
+                <span class="badge warning">Admin</span>
+                <strong style="font-size:var(--text-lg)">Admin login</strong>
+                <input type="email" id="adminEmail" placeholder="admin@college.edu" required />
+                <input type="password" id="adminPassword" placeholder="Password" required />
+                <div id="adminError" style="color: var(--color-error); font-size: var(--text-xs); display: none;">Invalid email or password</div>
+                <button type="submit" class="action-btn primary">Continue as admin</button>
+            </form>
+        </div>
+    </div>
+
+    <a href="#mainContent" class="skip-link">Skip to content</a>
+    <div class="app-shell hidden" id="appShell">
+        <aside class="sidebar">
+            <div class="brand-card reveal visible">
+                <div class="logo-wrap" aria-hidden="true">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9.5 12 4l9 5.5-9 5-9-5Z"></path>
+                        <path d="M7 12.5V16c0 1.5 2.8 3 5 3s5-1.5 5-3v-3.5"></path>
+                        <path d="M21 10v5"></path>
+                    </svg>
+                </div>
+                <div class="brand-copy">
+                    <h1>UniBOT</h1>
+                    <p>An AI Powered ChatBot</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-block reveal visible" aria-label="Sidebar navigation">
+                <div class="tiny-label">Navigation</div>
+                <div class="nav-grid">
+                    <button class="nav-btn active" data-section="dashboard">Dashboard</button>
+                    <button class="nav-btn" data-section="resources">Resources</button>
+                    <button class="nav-btn" data-section="attendance">Attendance</button>
+                    <button class="nav-btn" data-section="marks">Marks</button>
+                    <button class="nav-btn" data-section="circulars">Circulars</button>
+                    <button class="nav-btn" data-section="rules">Rules</button>
+                    <button class="nav-btn" data-section="chatbot">AI Assistant</button>
+                    <button class="nav-btn" data-section="uploads" id="uploadsNavBtn">Uploads & Entry</button>
+                </div>
+            </nav>
+
+            <div class="sidebar-block reveal visible">
+                <div class="tiny-label">System health</div>
+                <div class="status-row"><span style="display:flex;align-items:center;gap:.75rem;"><span
+                            class="status-dot"></span><strong style="font-size:var(--text-sm)">Live portal
+                            status</strong></span><small class="muted">Online</small></div>
+                <div class="status-row"><span><strong style="font-size:var(--text-sm)">Firebase ready</strong>
+                        <div class="muted">Auth, Firestore, Storage</div>
+                    </span><small class="badge primary">Connect</small></div>
+            </div>
+        </aside>
+
+        <main class="main" id="mainContent">
+            <header class="topbar">
+                <div class="topbar-copy">
+                    <h2 id="pageTitle">Student dashboard</h2>
+                    <p id="pageSubtitle">Monitor attendance, subject notes, marks, circulars and note-grounded doubts
+                        from one portal.</p>
+                </div>
+                <div class="topbar-actions">
+                    <span class="badge" id="userNameDisplay" style="display: none; background: var(--color-surface-offset); color: var(--color-text);"></span>
+                    <span class="badge primary" id="roleBadge">Student view</span>
+                    <button class="top-icon" id="themeToggle" aria-label="Switch theme">☾</button>
+                    <button class="action-btn secondary" data-jump="chatbot">Ask AI</button>
+                    <button class="action-btn primary" id="logoutBtn">Logout</button>
+                </div>
+            </header>
+
+            <div class="content">
+                <section class="page-section" id="dashboard">
+                    <div class="hero-layout">
+                        <article class="spotlight reveal visible">
+                            <div class="badge primary">Smart academic workspace</div>
+                            <div class="spotlight-grid">
+                                <div>
+                                    <h3>Modern campus portal for learning, attendance and AI-guided student support.
+                                    </h3>
+                                    <p>This version adds a more polished dashboard, richer visual hierarchy,
+                                        motion-based feedback, improved information density, and sections that look
+                                        closer to a deployable college product instead of a plain prototype.</p>
+                                    <div class="spotlight-actions">
+                                        <button class="action-btn primary" data-jump="resources">Browse
+                                            resources</button>
+                                    </div>
+                                </div>
+                                <div class="mini-panel">
+                                    <div class="tiny-label">Today’s view</div>
+                                    <div class="mini-grid">
+                                        <div class="metric-card"><span>Attendance</span><strong
+                                                id="overallAttendance">84.6%</strong><small>Across 5 tracked
+                                                subjects</small></div>
+                                        <div class="metric-card"><span>Average marks</span><strong>78 /
+                                                100</strong><small>Updated this week</small></div>
+                                        <div class="metric-card"><span>Unread circulars</span><strong>3</strong><small>2
+                                                urgent notices</small></div>
+                                        <div class="metric-card"><span>AI
+                                                answers</span><strong>18</strong><small>Student doubts this week</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+
+                        <aside class="progress-card reveal visible">
+                            <div class="section-head" style="padding:0 0 var(--space-4) 0;border-bottom:none;">
+                                <div>
+                                    <h3>Readiness snapshot</h3>
+                                    <p>Fast overview of academic standing.</p>
+                                </div>
+                            </div>
+                            <div class="list">
+                                <div>
+                                    <div style="display:flex;justify-content:space-between;gap:1rem;"><strong>Semester
+                                            attendance safety</strong><span class="muted">84.6%</span></div>
+                                    <div class="progress"><span style="--target:84.6%"></span></div>
+                                </div>
+                                <div>
+                                    <div style="display:flex;justify-content:space-between;gap:1rem;"><strong>Assignment
+                                            completion</strong><span class="muted">72%</span></div>
+                                    <div class="progress"><span style="--target:72%"></span></div>
+                                </div>
+                                <div>
+                                    <div style="display:flex;justify-content:space-between;gap:1rem;"><strong>Internal
+                                            marks strength</strong><span class="muted">78%</span></div>
+                                    <div class="progress"><span style="--target:78%"></span></div>
+                                </div>
+                                <div class="empty-state" style="min-height:160px;">
+                                    <div class="badge success">AI insight</div>
+                                    <strong style="font-size:var(--text-lg)">DAA needs attention</strong>
+                                    <p class="muted" style="max-width:30ch;">Attendance is near the threshold, so
+                                        skipping the next class may not be safe.</p>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+
+                    <div class="kpi-row reveal visible">
+                        <article class="metric-card"><span>Subjects</span><strong>6 Active</strong><small>Core and labs
+                                included</small></article>
+                        <article class="metric-card"><span>Best scorer</span><strong>DBMS</strong><small>92 /
+                                100</small></article>
+                        <article class="metric-card"><span>Low risk</span><strong>OS</strong><small>Safe to miss 1
+                                class</small></article>
+                        <article class="metric-card"><span>Faculty uploads</span><strong>24 files</strong><small>Updated
+                                this month</small></article>
+                    </div>
+
+                    <section class="feature-grid reveal visible">
+                        <article class="feature-tile">
+                            <div class="icon" aria-hidden="true">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"></path>
+                                </svg>
+                            </div>
+                            <div><strong>Note-aware AI</strong>
+                                <p class="muted">Students can ask doubts from the selected note only, which matches your
+                                    chatbot requirement.</p>
+                            </div>
+                        </article>
+                        <article class="feature-tile">
+                            <div class="icon" aria-hidden="true">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 3v18h18"></path>
+                                    <path d="m7 14 4-4 3 3 5-7"></path>
+                                </svg>
+                            </div>
+                            <div><strong>Subject analytics</strong>
+                                <p class="muted">Attendance and marks are shown separately for each subject with charts
+                                    and summaries.</p>
+                            </div>
+                        </article>
+                        <article class="feature-tile">
+                            <div class="icon" aria-hidden="true">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"></path>
+                                </svg>
+                            </div>
+                            <div><strong>Role-based access</strong>
+                                <p class="muted">Teachers, students and admin get different interfaces and permissions
+                                    after backend connection.</p>
+                            </div>
+                        </article>
+                    </section>
+
+                    <div class="grid-12 reveal visible">
+                        <section class="surface-card span-12">
+                            <div class="section-head">
+                                <div>
+                                    <h3>Attendance overview</h3>
+                                    <p>Subject-wise chart with visual comparison.</p>
+                                </div><span class="badge success">Updated today</span>
+                            </div>
+                            <div class="panel-body"><canvas id="attendanceChart" height="120"></canvas></div>
+                        </section>
+                        <section class="surface-card span-7">
+                            <div class="section-head">
+                                <div>
+                                    <h3>Recent circulars</h3>
+                                    <p>Priority notices from faculty and admin.</p>
+                                </div>
+                            </div>
+                            <div class="panel-body timeline">
+                                <div class="timeline-item"><span class="timeline-dot"></span>
+                                    <div><strong>Mid-sem practical schedule released</strong>
+                                        <div class="muted">Lab timetable updated for all CSE sections.</div>
+                                    </div>
+                                </div>
+                                <div class="timeline-item"><span class="timeline-dot"></span>
+                                    <div><strong>Library renewal closes on Friday</strong>
+                                        <div class="muted">Students should renew pending books before 4 PM.</div>
+                                    </div>
+                                </div>
+                                <div class="timeline-item"><span class="timeline-dot"></span>
+                                    <div><strong>Hackathon registration opened</strong>
+                                        <div class="muted">Department coordinator shared registration guidance.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <section class="surface-card span-5">
+                            <div class="section-head">
+                                <div>
+                                    <h3>Selected AI context</h3>
+                                    <p>Current resource used for note-grounded explanation.</p>
+                                </div>
+                            </div>
+                            <div class="panel-body list">
+                                <div class="list-item">
+                                    <div><strong>Operating Systems - Deadlocks</strong>
+                                        <div class="muted">Main note currently selected for explanation support.</div>
+                                    </div><span class="badge primary">Current</span>
+                                </div>
+                                <div class="list-item">
+                                    <div><strong>DAA revision sheet</strong>
+                                        <div class="muted">Available for topic-specific follow-up questions.</div>
+                                    </div><span class="badge success">Ready</span>
+                                </div>
+                                <div class="list-item">
+                                    <div><strong>College rules handbook</strong>
+                                        <div class="muted">Used for policy and attendance-related answers.</div>
+                                    </div><span class="badge warning">Restricted scope</span>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </section>
+
+                <section class="page-section hidden" id="resources">
+                    <div class="filter-row reveal visible">
+                        <button class="filter-chip active">All</button>
+                        <button class="filter-chip">OS</button>
+                        <button class="filter-chip">DBMS</button>
+                        <button class="filter-chip">DAA</button>
+                        <button class="filter-chip">Circulars</button>
+                    </div>
+                    <section class="surface-card reveal visible">
+                        <div class="section-head">
+                            <div>
+                                <h3>Academic resources</h3>
+                                <p>Professional library-style layout for faculty uploads and student browsing.</p>
+                            </div><button class="action-btn secondary">Upload filter</button>
+                        </div>
+                        <div class="panel-body list">
+                            <div class="list-item">
+                                <div><strong>Operating Systems Unit 3 Notes</strong>
+                                    <div class="muted">Deadlocks, scheduling, critical section and examples. Uploaded by
+                                        Prof. Anitha.</div>
+                                </div>
+                                <div class="stats-line"><span class="badge primary">OS</span><button
+                                        class="action-btn secondary">Preview</button></div>
+                            </div>
+                            <div class="list-item">
+                                <div><strong>DAA Quick Revision Sheet</strong>
+                                    <div class="muted">Greedy, dynamic programming and backtracking summary.</div>
+                                </div>
+                                <div class="stats-line"><span class="badge primary">DAA</span><button
+                                        class="action-btn secondary">Open PDF</button></div>
+                            </div>
+                            <div class="list-item">
+                                <div><strong>DBMS Lab Circular</strong>
+                                    <div class="muted">Experiment sequence, viva checklist and marks split.</div>
+                                </div>
+                                <div class="stats-line"><span class="badge primary">DBMS</span><button
+                                        class="action-btn secondary">View</button></div>
+                            </div>
+                            <div class="list-item">
+                                <div><strong>CN Handwritten Notes</strong>
+                                    <div class="muted">Protocols, layering model and numericals.</div>
+                                </div>
+                                <div class="stats-line"><span class="badge primary">CN</span><button
+                                        class="action-btn secondary">Download</button></div>
+                            </div>
+                        </div>
+                    </section>
+                </section>
+
+                <section class="page-section hidden" id="attendance">
+                    <div class="grid-12 reveal visible">
+                        <section class="surface-card span-7">
+                            <div class="section-head">
+                                <div>
+                                    <h3>Subject attendance table</h3>
+                                    <p>Professional table with subject-level attendance safety.</p>
+                                </div><span class="badge primary">Threshold 75%</span>
+                            </div>
+                            <div class="panel-body table-wrap">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Subject</th>
+                                            <th>Attended</th>
+                                            <th>Total</th>
+                                            <th>Current</th>
+                                            <th>After 1 bunk</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="attendanceTable"></tbody>
+                                </table>
+                            </div>
+                        </section>
+                        <section class="surface-card span-5">
+                            <div class="section-head">
+                                <div>
+                                    <h3>Bunk calculator</h3>
+                                    <p>AI-style summary with exact percentage drop.</p>
+                                </div>
+                            </div>
+                            <div class="panel-body list" id="bunkCards"></div>
+                        </section>
+                        <section class="surface-card span-12">
+                            <div class="section-head">
+                                <div>
+                                    <h3>Attendance trend activity</h3>
+                                    <p>Recent decisions and warning states.</p>
+                                </div>
+                            </div>
+                            <div class="panel-body timeline">
+                                <div class="timeline-item"><span class="timeline-dot"></span>
+                                    <div><strong>DAA flagged near threshold</strong>
+                                        <div class="muted">If one more class is missed, attendance may drop under the
+                                            required level.</div>
+                                    </div>
+                                </div>
+                                <div class="timeline-item"><span class="timeline-dot"></span>
+                                    <div><strong>DBMS remains in safe range</strong>
+                                        <div class="muted">Current subject attendance remains above the minimum after
+                                            one absence.</div>
+                                    </div>
+                                </div>
+                                <div class="timeline-item"><span class="timeline-dot"></span>
+                                    <div><strong>OS attendance stable</strong>
+                                        <div class="muted">A healthy buffer remains before the threshold.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </section>
+
+                <section class="page-section hidden" id="marks">
+                    <div class="grid-12 reveal visible">
+                        <section class="surface-card span-8">
+                            <div class="section-head">
+                                <div>
+                                    <h3>Marks analytics</h3>
+                                    <p>Polished academic graph for internal performance.</p>
+                                </div><span class="badge success">Visualized</span>
+                            </div>
+                            <div class="panel-body"><canvas id="marksChart" height="120"></canvas></div>
+                        </section>
+                        <section class="surface-card span-4">
+                            <div class="section-head">
+                                <div>
+                                    <h3>Performance insights</h3>
+                                    <p>Quick interpretation block.</p>
+                                </div>
+                            </div>
+                            <div class="panel-body list">
+                                <div class="list-item">
+                                    <div><strong>Best subject</strong>
+                                        <div class="muted">DBMS - 92/100</div>
+                                    </div><span class="badge success">Excellent</span>
+                                </div>
+                                <div class="list-item">
+                                    <div><strong>Needs focus</strong>
+                                        <div class="muted">DAA - 64/100</div>
+                                    </div><span class="badge warning">Improve</span>
+                                </div>
+                                <div class="list-item">
+                                    <div><strong>Class average</strong>
+                                        <div class="muted">71/100 benchmark</div>
+                                    </div><span class="badge primary">Reference</span>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </section>
+
+                <section class="page-section hidden" id="circulars">
+                    <section class="surface-card reveal visible">
+                        <div class="section-head">
+                            <div>
+                                <h3>Circular centre</h3>
+                                <p>A cleaner, more official presentation for notices and announcements.</p>
+                            </div><span class="badge warning">3 New</span>
+                        </div>
+                        <div class="panel-body list">
+                            <div class="list-item">
+                                <div><strong>Exam fee last date</strong>
+                                    <div class="muted">Pay before May 12 to avoid penalty and late processing.</div>
+                                </div><small class="muted">29 Apr 2026</small>
+                            </div>
+                            <div class="list-item">
+                                <div><strong>Industrial visit approval</strong>
+                                    <div class="muted">Final list published for CSE 3rd year students.</div>
+                                </div><small class="muted">27 Apr 2026</small>
+                            </div>
+                            <div class="list-item">
+                                <div><strong>Attendance shortfall review meeting</strong>
+                                    <div class="muted">Meet class coordinator with parents if attendance is below
+                                        threshold.</div>
+                                </div><small class="muted">24 Apr 2026</small>
+                            </div>
+                        </div>
+                    </section>
+                </section>
+
+                <section class="page-section hidden" id="rules">
+                    <div class="grid-12 reveal visible">
+                        <section class="surface-card span-8">
+                            <div class="section-head">
+                                <div>
+                                    <h3>College rules and policies</h3>
+                                    <p>Rules students can read and chatbot can reference.</p>
+                                </div>
+                            </div>
+                            <div class="panel-body list">
+                                <div class="list-item">
+                                    <div><strong>Attendance requirement</strong>
+                                        <div class="muted">Students should maintain the minimum percentage required by
+                                            the institution to remain exam eligible.</div>
+                                    </div><span class="badge primary">Academic</span>
+                                </div>
+                                <div class="list-item">
+                                    <div><strong>ID card policy</strong>
+                                        <div class="muted">A valid college ID card should be carried inside the campus.
+                                        </div>
+                                    </div><span class="badge success">Discipline</span>
+                                </div>
+                                <div class="list-item">
+                                    <div><strong>Assignment submission</strong>
+                                        <div class="muted">Delayed submissions may affect internal marks unless approved
+                                            by faculty.</div>
+                                    </div><span class="badge warning">Internal</span>
+                                </div>
+                                <div class="list-item">
+                                    <div><strong>Lab conduct</strong>
+                                        <div class="muted">Students should follow lab safety and faculty instructions
+                                            during sessions.</div>
+                                    </div><span class="badge primary">Lab</span>
+                                </div>
+                            </div>
+                        </section>
+                        <section class="surface-card span-4">
+                            <div class="section-head">
+                                <div>
+                                    <h3>AI rule usage</h3>
+                                    <p>How answers should remain controlled.</p>
+                                </div>
+                            </div>
+                            <div class="panel-body list">
+                                <div class="list-item">
+                                    <div><strong>Allowed source</strong>
+                                        <div class="muted">Rules collection in database</div>
+                                    </div>
+                                </div>
+                                <div class="list-item">
+                                    <div><strong>Blocked source</strong>
+                                        <div class="muted">Open internet and unrelated notes</div>
+                                    </div>
+                                </div>
+                                <div class="list-item">
+                                    <div><strong>Use case</strong>
+                                        <div class="muted">Policy explanation and attendance guidance</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </section>
+
+                <section class="page-section hidden" id="chatbot">
+                    <div class="grid-12 reveal visible">
+                        <section class="surface-card span-8">
+                            <div class="section-head">
+                                <div>
+                                    <h3>AI academic assistant</h3>
+                                    <p>Professional chat interface with note-based and attendance-based prompts.</p>
+                                </div><span class="badge success">Scoped AI</span>
+                            </div>
+                            <div class="chat-shell">
+                                <aside class="chat-robot-panel">
+                                    <div class="robot-badge">AI tutor</div>
+                                    <div>
+                                        <div class="badge primary">Campus AI robot</div>
+                                        <h4 style="font-size:var(--text-lg);margin-top:var(--space-3);">A full chatbot
+                                            robot design for your portal.</h4>
+                                        <p class="muted" style="margin-top:var(--space-2);">This robot becomes the face
+                                            of the academic assistant and makes the chatbot section look more like a
+                                            real product.</p>
+                                    </div>
+                                    <div class="robot-stage" aria-hidden="true">
+                                        <svg viewBox="0 0 240 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <defs>
+                                                <linearGradient id="botBody" x1="48" y1="44" x2="194" y2="244"
+                                                    gradientUnits="userSpaceOnUse">
+                                                    <stop stop-color="#8CC7D0" />
+                                                    <stop offset="1" stop-color="#0B6F74" />
+                                                </linearGradient>
+                                                <linearGradient id="botFace" x1="80" y1="92" x2="162" y2="176"
+                                                    gradientUnits="userSpaceOnUse">
+                                                    <stop stop-color="#F7FCFC" />
+                                                    <stop offset="1" stop-color="#D6F0EE" />
+                                                </linearGradient>
+                                                <radialGradient id="botShadow" cx="0" cy="0" r="1"
+                                                    gradientUnits="userSpaceOnUse"
+                                                    gradientTransform="translate(121 260) rotate(90) scale(16 62)">
+                                                    <stop stop-color="#0B6F74" stop-opacity="0.25" />
+                                                    <stop offset="1" stop-color="#0B6F74" stop-opacity="0" />
+                                                </radialGradient>
+                                            </defs>
+                                            <ellipse cx="121" cy="260" rx="62" ry="16" fill="url(#botShadow)"
+                                                class="robot-glow" />
+                                            <path d="M120 18V42" stroke="#0B6F74" stroke-width="8"
+                                                stroke-linecap="round" />
+                                            <circle cx="120" cy="14" r="10" fill="#2D6FD2" />
+                                            <rect x="57" y="42" width="126" height="150" rx="44" fill="url(#botBody)" />
+                                            <rect x="72" y="58" width="96" height="84" rx="28" fill="#0E4348"
+                                                opacity="0.32" />
+                                            <rect x="78" y="64" width="84" height="70" rx="24" fill="url(#botFace)" />
+                                            <g class="robot-eye">
+                                                <rect x="94" y="91" width="17" height="17" rx="8.5" fill="#0B6F74" />
+                                                <rect x="129" y="91" width="17" height="17" rx="8.5" fill="#0B6F74" />
+                                                <circle cx="102.5" cy="99.5" r="3" fill="#D9FFFF" />
+                                                <circle cx="137.5" cy="99.5" r="3" fill="#D9FFFF" />
+                                            </g>
+                                            <path d="M96 122C103 129 112 133 120 133C128 133 137 129 144 122"
+                                                stroke="#0B6F74" stroke-width="6" stroke-linecap="round" />
+                                            <rect x="96" y="151" width="48" height="10" rx="5" fill="#D6F0EE"
+                                                opacity="0.95" />
+                                            <rect x="92" y="186" width="56" height="18" rx="9" fill="#F5FCFC"
+                                                opacity="0.86" />
+                                            <circle cx="120" cy="195" r="5" fill="#2D6FD2" />
+                                            <rect x="82" y="194" width="10" height="40" rx="5" fill="#0B6F74" />
+                                            <rect x="148" y="194" width="10" height="40" rx="5" fill="#0B6F74" />
+                                            <g class="robot-wave">
+                                                <rect x="30" y="112" width="18" height="66" rx="9" fill="#0B6F74" />
+                                                <circle cx="39" cy="186" r="14" fill="#8CC7D0" />
+                                                <circle cx="39" cy="186" r="7" fill="#F7FCFC" />
+                                            </g>
+                                            <rect x="192" y="112" width="18" height="66" rx="9" fill="#0B6F74" />
+                                            <circle cx="201" cy="186" r="14" fill="#8CC7D0" />
+                                            <circle cx="201" cy="186" r="7" fill="#F7FCFC" />
+                                            <rect x="86" y="234" width="16" height="36" rx="8" fill="#0B6F74" />
+                                            <rect x="138" y="234" width="16" height="36" rx="8" fill="#0B6F74" />
+                                        </svg>
+                                    </div>
+                                    <div class="list-item" style="background:var(--color-surface);">
+                                        <div>
+                                            <strong>Robot mode</strong>
+                                            <div class="muted">Note explanation, attendance advice and policy answers.
+                                            </div>
+                                        </div>
+                                        <span class="badge success">Active</span>
+                                    </div>
+                                </aside>
+                                <div class="chat-main">
+                                    <div class="chat-toolbar">
+                                        <div>
+                                            <strong>Restricted answer mode</strong>
+                                            <div class="muted">Notes, rules, circulars, attendance and marks only</div>
+                                        </div>
+                                        <div class="segment">
+                                            <button class="active">Note help</button>
+                                            <button>Attendance</button>
+                                            <button>Rules</button>
+                                        </div>
+                                    </div>
+                                    <div class="chat-messages" id="chatMessages">
+                                        <div class="msg bot">I can explain only from the selected note and the content
+                                            stored in the portal. Ask about the current Operating Systems note, college
+                                            rules, marks, circulars or attendance.</div>
+                                        <div class="msg user">Explain deadlock prevention from the selected note.</div>
+                                        <div class="msg bot">From the selected OS note: deadlock prevention removes at
+                                            least one condition required for deadlock, such as mutual exclusion, hold
+                                            and wait, no preemption, or circular wait.</div>
+                                        <div class="msg user">Can I bunk the next DAA class?</div>
+                                        <div class="msg bot" id="aiAttendanceReply">Your current DAA attendance is
+                                            76.7%. If you miss the next class, it becomes 74.2%, so it may fall below
+                                            the 75% target.</div>
+                                    </div>
+                                    <div class="chat-input">
+                                        <input id="chatInput" type="text"
+                                            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();onChatSend();}"
+                                            placeholder="Ask a question only about notes, attendance, marks, rules or circulars" />
+                                        <button class="action-btn primary" id="sendBtn" onclick="onChatSend()">Send</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <section class="surface-card span-4">
+                            <div class="section-head">
+                                <div>
+                                    <h3>AI grounding panel</h3>
+                                    <p>Backend connection references.</p>
+                                </div>
+                            </div>
+                            <div class="panel-body list">
+                                <div class="list-item">
+                                    <div><strong>Current note</strong>
+                                        <div class="muted">notes_os_unit3_deadlocks</div>
+                                    </div><span class="badge primary">Linked</span>
+                                </div>
+                                <div class="list-item">
+                                    <div><strong>Allowed data</strong>
+                                        <div class="muted">notes, circulars, rules, marks, attendance</div>
+                                    </div><span class="badge success">Scoped</span>
+                                </div>
+                                <div class="list-item">
+                                    <div><strong>Denied data</strong>
+                                        <div class="muted">internet, hidden admin docs, other student records</div>
+                                    </div><span class="badge error">Blocked</span>
+                                </div>
+                                <div class="list-item">
+                                    <div><strong>Future backend</strong>
+                                        <div class="muted">Firebase + protected AI endpoint</div>
+                                    </div><span class="badge warning">Pending</span>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </section>
+
+                <section class="page-section hidden" id="uploads">
+                    <section class="surface-card reveal visible">
+                        <div class="section-head">
+                            <div>
+                                <h3>Teacher upload and entry panel</h3>
+                                <p>More professional form layout for notes, circulars, attendance and marks.</p>
+                            </div><span class="badge primary">Demo form</span>
+                        </div>
+                        <div class="panel-body form-grid" id="teacherEntryForm">
+                            <select id="entryStudentSelect">
+                                <option value="">Select a student...</option>
+                            </select>
+                            <input type="text" id="entrySubjectName" placeholder="Subject name" />
+                            <select id="entryClassSection">
+                                <option>Choose class / section</option>
+                                <option>CSE A</option>
+                                <option>CSE B</option>
+                            </select>
+                            <input type="text" id="entryTopic" placeholder="Topic / circular title" />
+                            <input type="file" id="entryFile" />
+                            <input type="number" id="entryClasses" placeholder="Classes conducted" />
+                            <input type="number" id="entryMarks" placeholder="Marks scored" />
+                            <textarea id="entryDescription" rows="4" placeholder="Description, circular text or note summary"
+                                style="grid-column:1/-1"></textarea>
+                            <div style="grid-column:1/-1;display:flex;gap:var(--space-3);flex-wrap:wrap;">
+                                <button type="button" class="action-btn primary" id="saveRecordBtn">Save record</button>
+                                <button type="button" class="action-btn secondary" id="resetFormBtn">Reset form</button>
+                            </div>
+                        </div>
+                    </section>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <button class="floating-fab hidden" id="fabBtn" data-jump="chatbot" aria-label="Open AI assistant robot">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="5" y="8" width="14" height="11" rx="3"></rect>
+            <path d="M12 4v4"></path>
+            <path d="M9 4h6"></path>
+            <circle cx="9.5" cy="13" r="1"></circle>
+            <circle cx="14.5" cy="13" r="1"></circle>
+            <path d="M9 16h6"></path>
+            <path d="M5 12H3"></path>
+            <path d="M21 12h-2"></path>
+        </svg>
+    </button>
+
+    <script>
+        const attendanceData = [
+            { subject: 'OS', attended: 34, total: 40 },
+            { subject: 'DBMS', attended: 29, total: 34 },
+            { subject: 'DAA', attended: 23, total: 30 },
+            { subject: 'CN', attended: 31, total: 36 },
+            { subject: 'SE', attended: 27, total: 31 }
+        ];
+        let marksData = [88, 92, 64, 79, 83];
+        let marksLabels = ['OS', 'DBMS', 'DAA', 'CN', 'SE'];
+        let marksChartInstance = null;  // created lazily when marks tab is opened
+        let currentStudentEmail = null; // tracks who is logged in
+
+        const sections = document.querySelectorAll('.page-section');
+        const navButtons = document.querySelectorAll('.nav-btn');
+        const pageTitle = document.getElementById('pageTitle');
+        const pageSubtitle = document.getElementById('pageSubtitle');
+        const roleBadge = document.getElementById('roleBadge');
+        const themeToggle = document.getElementById('themeToggle');
+        const titles = {
+            dashboard: ['Student dashboard', 'Monitor attendance, subject notes, marks, circulars and note-grounded doubts from one portal.'],
+            resources: ['Resources library', 'Browse notes, PDFs, files and subject materials in a polished resource layout.'],
+            attendance: ['Attendance analytics', 'Review subject-level attendance, bunk safety and risk trends.'],
+            marks: ['Marks performance', 'Explore internal marks with chart-based academic comparison.'],
+            circulars: ['Circular centre', 'Track official updates, notices and department announcements.'],
+            rules: ['College rules', 'View institutional policies used by students and the AI assistant.'],
+            chatbot: ['AI academic assistant', 'Ask note-scoped questions and get attendance guidance from portal data.'],
+            uploads: ['Uploads & Entry', 'Teacher entry forms for records and resources.']
+        };
+
+        function currentPercent(attended, total) { return ((attended / total) * 100).toFixed(1); }
+        function bunkPercent(attended, total) { return ((attended / (total + 1)) * 100).toFixed(1); }
+
+        function openSection(id) {
+            sections.forEach(section => section.classList.toggle('hidden', section.id !== id));
+            navButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.section === id));
+            pageTitle.textContent = titles[id][0];
+            pageSubtitle.textContent = titles[id][1];
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Lazily create the marks chart when the tab is first opened
+            if (id === 'marks') {
+                setTimeout(() => {
+                    if (!marksChartInstance) {
+                        const css = getComputedStyle(document.documentElement);
+                        const opts = {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: { grid: { display: false }, ticks: { color: css.getPropertyValue('--color-text-muted').trim() } },
+                                y: { beginAtZero: true, grid: { color: 'rgba(120,120,120,.14)' }, ticks: { color: css.getPropertyValue('--color-text-muted').trim() } }
+                            }
+                        };
+                        marksChartInstance = new Chart(document.getElementById('marksChart'), {
+                            type: 'line',
+                            data: {
+                                labels: [...marksLabels],
+                                datasets: [{ data: [...marksData], borderColor: '#0b6f74', backgroundColor: 'rgba(11,111,116,.12)', fill: true, tension: .36, pointRadius: 4, pointHoverRadius: 6, pointBackgroundColor: '#0b6f74' }]
+                            },
+                            options: opts
+                        });
+                    } else {
+                        marksChartInstance.update();
+                    }
+                }, 50);
+            }
+        }
+
+        navButtons.forEach(btn => btn.addEventListener('click', () => openSection(btn.dataset.section)));
+        document.querySelectorAll('[data-jump]').forEach(btn => btn.addEventListener('click', () => openSection(btn.dataset.jump)));
+
+        const VALID_CREDENTIALS = {
+            student: [
+                { name: 'Tarun D', email: 'aaa123@gmail.com', pass: 'SNPSU' },
+                { name: 'Yashwanth S', email: 'bbb123@gmail.com', pass: 'SNPSU' },
+                { name: 'Thejas J', email: 'ccc123@gmail.com', pass: 'SNPSU' },
+                { name: 'Vishwajeet S', email: 'ddd123@gmail.com', pass: 'SNPSU' },
+                { name: 'Yashas M', email: 'eee123@gmail.com', pass: 'SNPSU' }
+            ],
+            teacher: [
+                { name: 'Narendra Babu', email: 'teacher1@gmail.com', pass: 'SNPSU' },
+                { name: 'Sneha', email: 'teacher2@gmail.com', pass: 'SNPSU' }
+            ],
+            admin: [
+                { name: 'Deepak Sakkari', email: 'admin1@gmail.com', pass: 'SNPSU' }
+            ]
+        };
+
+        const TEACHER_SUBJECTS = {
+            'teacher1@gmail.com': 'DBMS',
+            'teacher2@gmail.com': 'OS'
+        };
+
+        // Default baseline marks for all students
+        const DEFAULT_MARKS = { OS: 88, DBMS: 92, DAA: 64, CN: 79, SE: 83 };
+
+        function getStudentMarks(email) {
+            const stored = localStorage.getItem('marks_' + email);
+            return stored ? JSON.parse(stored) : { ...DEFAULT_MARKS };
+        }
+
+        function saveStudentMarks(email, marksObj) {
+            localStorage.setItem('marks_' + email, JSON.stringify(marksObj));
+        }
+
+        function applyMarksToChart(marksObj) {
+            marksLabels.length = 0;
+            marksData.length = 0;
+            Object.entries(marksObj).forEach(([subj, score]) => {
+                marksLabels.push(subj);
+                marksData.push(Number(score));
+            });
+            // If chart already exists, update it. If not, it'll pick up marksLabels/marksData when lazily created.
+            if (marksChartInstance) {
+                marksChartInstance.data.labels = [...marksLabels];
+                marksChartInstance.data.datasets[0].data = [...marksData];
+                marksChartInstance.update();
+            }
+        }
+
+        async function loginAs(role) {
+            // Hide previous errors
+            document.getElementById('studentError').style.display = 'none';
+            document.getElementById('teacherError').style.display = 'none';
+            document.getElementById('adminError').style.display = 'none';
+
+            const emailInput = document.getElementById(role + 'Email').value;
+            const passInput = document.getElementById(role + 'Password').value;
+
+            const matchedUser = VALID_CREDENTIALS[role].find(cred => cred.email === emailInput && cred.pass === passInput);
+
+            if (!matchedUser) {
+                document.getElementById(role + 'Error').style.display = 'block';
+                return; // Stop execution if credentials don't match
+            }
+
+            document.getElementById('userNameDisplay').textContent = matchedUser.name;
+            document.getElementById('userNameDisplay').style.display = 'inline-flex';
+
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('appShell').classList.remove('hidden');
+            document.getElementById('fabBtn').classList.remove('hidden');
+
+            roleBadge.textContent = role.charAt(0).toUpperCase() + role.slice(1) + ' view';
+            roleBadge.className = 'badge ' + (role === 'student' ? 'primary' : role === 'teacher' ? 'success' : 'warning');
+
+            if (role === 'teacher') {
+                titles.dashboard = ['Teacher workspace', 'Upload resources, publish attendance, enter marks and support student questions.'];
+                document.getElementById('uploadsNavBtn').classList.remove('hidden');
+            } else if (role === 'admin') {
+                titles.dashboard = ['Admin control panel', 'Manage circulars, rules, departments, permissions and institutional settings.'];
+                document.getElementById('uploadsNavBtn').classList.remove('hidden');
+            } else {
+                titles.dashboard = ['Student dashboard', 'Monitor attendance, subject notes, marks, circulars and note-grounded doubts from one portal.'];
+                document.getElementById('uploadsNavBtn').classList.add('hidden');
+            }
+
+            openSection('dashboard');
+
+            // Clear inputs for security
+            document.getElementById(role + 'Email').value = '';
+            document.getElementById(role + 'Password').value = '';
+
+            // Re-trigger chart rendering layout fix
+            setTimeout(() => {
+                window.dispatchEvent(new Event('resize'));
+            }, 100);
+
+            if (role === 'student') {
+                currentStudentEmail = emailInput;
+                const marksObj = getStudentMarks(emailInput);
+                // Destroy old chart so it gets recreated fresh with new data
+                if (marksChartInstance) {
+                    marksChartInstance.destroy();
+                    marksChartInstance = null;
+                }
+                applyMarksToChart(marksObj);
+            } else {
+                currentStudentEmail = null;
+            }
+
+            if (role === 'teacher') {
+                // Populate student dropdown
+                const studentSelect = document.getElementById('entryStudentSelect');
+                studentSelect.innerHTML = '<option value="">Select a student...</option>';
+                VALID_CREDENTIALS.student.forEach(s => {
+                    studentSelect.insertAdjacentHTML('beforeend', `<option value="${s.email}">${s.name}</option>`);
+                });
+
+                // Pre-fill assigned subject and lock it
+                const assignedSubject = TEACHER_SUBJECTS[emailInput] || '';
+                const subjectInput = document.getElementById('entrySubjectName');
+                subjectInput.value = assignedSubject;
+                subjectInput.readOnly = !!assignedSubject;
+                subjectInput.style.opacity = assignedSubject ? '0.7' : '1';
+            }
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('appShell').classList.add('hidden');
+            document.getElementById('fabBtn').classList.add('hidden');
+        });
+
+        let theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+        themeToggle.textContent = theme === 'dark' ? '☀' : '☾';
+        themeToggle.addEventListener('click', () => {
+            theme = theme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+            themeToggle.textContent = theme === 'dark' ? '☀' : '☾';
+        });
+
+        const attendanceTable = document.getElementById('attendanceTable');
+        const bunkCards = document.getElementById('bunkCards');
+        const bunkAdvice = document.getElementById('bunkAdvice');
+
+        attendanceData.forEach(item => {
+            const current = currentPercent(item.attended, item.total);
+            const next = bunkPercent(item.attended, item.total);
+            const safe = Number(next) >= 75;
+            const drop = (current - next).toFixed(1);
+            attendanceTable.insertAdjacentHTML('beforeend', `
+        <tr>
+          <td><strong>${item.subject}</strong></td>
+          <td>${item.attended}</td>
+          <td>${item.total}</td>
+          <td><strong>${current}%</strong></td>
+          <td>${next}%</td>
+          <td><span class="badge ${safe ? 'success' : 'warning'}">${safe ? 'Can bunk' : 'Unsafe'}</span></td>
+        </tr>
+      `);
+            bunkCards.insertAdjacentHTML('beforeend', `
+        <div class="list-item">
+          <div>
+            <strong>${item.subject}</strong>
+            <div class="muted">Current ${current}% → after bunk ${next}%</div>
+          </div>
+          <small class="muted">Drop ${drop}%</small>
+        </div>
+      `);
+            bunkAdvice.insertAdjacentHTML('beforeend', `
+        <div class="list-item">
+          <div>
+            <strong>${item.subject}</strong>
+            <div class="muted">${safe ? 'Still safe after one missed class.' : 'One more absence can push it below the threshold.'}</div>
+          </div>
+          <span class="badge ${safe ? 'success' : 'warning'}">${next}%</span>
+        </div>
+      `);
+        });
+
+        const overall = (attendanceData.reduce((sum, item) => sum + Number(currentPercent(item.attended, item.total)), 0) / attendanceData.length).toFixed(1);
+        document.getElementById('overallAttendance').textContent = `${overall}%`;
+        document.getElementById('aiAttendanceReply').textContent = `Your current DAA attendance is ${currentPercent(23, 30)}%. If you miss the next class, it becomes ${bunkPercent(23, 30)}%, so it may fall below the 75% target.`;
+
+        const css = getComputedStyle(document.documentElement);
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false }, ticks: { color: css.getPropertyValue('--color-text-muted').trim() } },
+                y: { beginAtZero: true, grid: { color: 'rgba(120,120,120,.14)' }, ticks: { color: css.getPropertyValue('--color-text-muted').trim() } }
+            }
+        };
+
+        new Chart(document.getElementById('attendanceChart'), {
+            type: 'bar',
+            data: {
+                labels: attendanceData.map(item => item.subject),
+                datasets: [{
+                    data: attendanceData.map(item => Number(currentPercent(item.attended, item.total))),
+                    backgroundColor: ['#0b6f74', '#2b8b88', '#6f8c39', '#2d6fd2', '#8bb2ef'],
+                    borderRadius: 12,
+                    borderSkipped: false
+                }]
+            },
+            options: chartOptions
+        });
+
+        // Remove the old static chart creation - it's now done lazily in openSection
+
+        document.getElementById('saveRecordBtn').addEventListener('click', () => {
+            const studentEmail = document.getElementById('entryStudentSelect').value;
+            const subject = document.getElementById('entrySubjectName').value.trim().toUpperCase();
+            const marks = Number(document.getElementById('entryMarks').value);
+
+            if (!studentEmail) {
+                alert('Please select a student first.');
+                return;
+            }
+            if (!subject) {
+                alert('Please enter a subject name.');
+                return;
+            }
+            if (isNaN(marks) || document.getElementById('entryMarks').value === '') {
+                alert('Please enter a valid marks score.');
+                return;
+            }
+
+            // Save to localStorage
+            const marksObj = getStudentMarks(studentEmail);
+            marksObj[subject] = marks;
+            saveStudentMarks(studentEmail, marksObj);
+
+            const studentName = document.getElementById('entryStudentSelect').options[document.getElementById('entryStudentSelect').selectedIndex].text;
+            alert(`✅ Marks saved!\n\nStudent: ${studentName}\nSubject: ${subject}\nMarks: ${marks}\n\n(Student will see this when they log in)`);
+
+            document.getElementById('entryMarks').value = '';
+            document.getElementById('entryStudentSelect').value = '';
+        });
+
+        document.getElementById('resetFormBtn').addEventListener('click', () => {
+            const formInputs = document.querySelectorAll('#teacherEntryForm input, #teacherEntryForm textarea, #teacherEntryForm select');
+            formInputs.forEach(input => input.value = '');
+        });
+
+        // FAQ functionality handled by the isolated script block above
+
+
+
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.12 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    </script>
+</body>
+
+</html>
